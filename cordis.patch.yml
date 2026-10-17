@@ -1,0 +1,6 @@
+# dsh-compaction-ledger bundle patch: mounts the plugin into the profile's
+# composition tree. The profile's package.json must list this package under
+# `dsh.profile.bundles` (the `dsh plugin add` flow does this automatically).
+- insert:
+    - id: compaction-ledger
+      name: dsh-compaction-ledger
