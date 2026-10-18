@@ -19,12 +19,13 @@ DSH Discussions record the same failure repeatedly: compaction silently truncate
 
 ## What you get
 
+- **`Ledger` tab** — a real tab beside Chat and Trajectory: the session's compaction timeline as a live page, updated by the host-pushed projection (no polling). Totals band plus one expandable card per compaction — summary preview and pruned tool results on expansion. ![The Ledger tab](docs/ledger-tab.png)
 - **`/ledger`** — headline + table: `# | Time | Trigger | Status | Items | Tokens | Took`
 - **`/ledger full`** — per-entry detail: error chains for failed compactions, the summary preview with its provider/model, and the pruned tool-result list (tool name, seq, token estimate)
 - **`/ledger json`** — the whole ledger as JSON for scripts and dashboards
 - **`/ledger restore last`** — injects a pointer message ("a compaction shadowed N items; use recall_pruned with this compactionId") into the running session without waking a turn
 - **`recall_pruned`** — model tool; no arguments lists the ledger, `{ compactionId }` recalls the shadowed content (pruned tool results first, otherwise the shadowed span, newest-first), `{ search }` filters by substring, `{ maxChars }` bounds the recall
-- **Rendered output** — the report and the recall result render as real Markdown in the chat (command card + tool card)
+- **Rendered output** — the report and the recall result render as styled native cards in the chat (status badges, trigger chips, token bars, per-item recall cards)
 
 ## How it works
 

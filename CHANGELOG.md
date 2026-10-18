@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0 (2026-10-18)
+
+The Ledger conversation-view tab.
+
+- **`Ledger` tab** — a real tab beside Chat and Trajectory (`conversation.view` slot, `order: 5`): the session's compaction timeline as a live page. Totals band (count, ok/failed, tokens shadowed, pruned results) plus one expandable card per compaction — time, trigger chip, status badge, token stats, and on expansion the summary preview and the pruned tool-result list.
+- **Live by projection** — the tab reads the `compactionLedger` wire projection through the standard `useProjection` prop: host-computed, pushed per session, zero RPC and zero client-side folding. The wire view now carries the bounded recent entries (last 20, pruned list capped at 10 per entry); the host fold state shape is unchanged.
+- **Empty state** — a dashed placeholder explaining when the ledger fills, with the `/compact` pointer, and a hint card on how to pull shadowed content back via `recall_pruned`.
+- Fully localized (en/zh) including card chrome; cards degrade gracefully when the client half is unavailable.
+
 ## 0.1.1 (2026-10-18)
 
 Styled native cards for the ledger and recall results.
