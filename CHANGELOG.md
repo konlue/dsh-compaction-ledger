@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 (2026-10-18)
+
+Styled native cards for the ledger and recall results.
+
+- **`/ledger` table** — custom grid instead of a raw Markdown table: colored status badges (success/failed/running), trigger chips with icons (manual/auto), per-row token-share bars, right-aligned monospace numerals, row hover separation. Full-mode detail keeps Markdown below the grid.
+- **`recall_pruned` cards** — each recalled item renders as its own card with a `seq` chip, a role badge (user/assistant/tool), a scroll-bounded monospace body, and an amber banner for truncation notices.
+- **Format contract** — the client parses the host's deterministic report text; the parsers are pinned by cross-layer sync tests that feed the real `renderReport`/`buildRecall` output through them on every test run. Any parse miss falls back to Markdown rendering, and missing primitives still degrade to monospace — the card can only get simpler, never broken.
+
 ## 0.1.0 (2026-10-18)
 
 Initial release.
