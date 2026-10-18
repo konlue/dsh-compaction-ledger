@@ -1,7 +1,7 @@
 {
   "name": "dsh-compaction-ledger",
   "description": "Compaction ledger for the DeepSeek Harness: audit every context compaction (what was shadowed, when, at what token cost) and let the model recall pruned content on demand",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "repository": {
     "type": "git",
