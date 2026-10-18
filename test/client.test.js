@@ -206,16 +206,17 @@ test("registers the report card on both slots under the names the host dispatche
   assert.equal(id, "dsh-compaction-ledger");
 
   assert.deepEqual(
-    ctx.registered.map((entry) => [entry.options.name, entry.options.key, entry.options.locale]),
+    ctx.registered.map((entry) => [entry.options.name, entry.options.key ?? entry.options.id, entry.options.locale]),
     [
       ["conversation.chat.commandview", "ledger", "compaction-ledger"],
       ["conversation.chat.commandview", "compaction-ledger", "compaction-ledger"],
       ["tool.call.toolview", "recall_pruned", "compaction-ledger"],
+      ["conversation.view", "ledger", "compaction-ledger"],
     ],
   );
   // Both dictionaries registered so the seat resolves either app language.
   assert.deepEqual(Object.keys(ctx.dictionaries["compaction-ledger"]).sort(), ["en", "zh"]);
-  assert.deepEqual(ctx.injected, ["conversation.chat.commandview", "tool.call.toolview"]);
+  assert.deepEqual(ctx.injected, ["conversation.chat.commandview", "tool.call.toolview", "conversation.view"]);
   // The framework calls every returned effect as a disposer, so a skipped
   // registration must not leave a null behind in the array.
   for (const effect of ctx.effects) {
@@ -244,7 +245,13 @@ test("an occupied slot key is skipped instead of taking the whole entry down", a
   console.warn = (...args) => warnings.push(args[0]);
   try {
     const { ctx } = await loadClient({ occupiedKeys: ["ledger"] });
-    assert.deepEqual(ctx.registered.map((entry) => entry.options.key), ["compaction-ledger", "recall_pruned"]);
+    // The view tab is identified by `id`, so it survives an occupied "ledger"
+    // command key; only the commandview entry is skipped.
+    assert.deepEqual(ctx.registered.map((entry) => entry.options.key ?? entry.options.id), [
+      "compaction-ledger",
+      "recall_pruned",
+      "ledger",
+    ]);
     for (const effect of ctx.effects) {
       for (const dispose of effect) assert.equal(typeof dispose, "function");
     }
