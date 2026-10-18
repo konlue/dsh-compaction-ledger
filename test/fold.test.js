@@ -233,7 +233,7 @@ test("state survives a JSON checkpoint round-trip", () => {
   assert.equal(next.open, "C-2");
 });
 
-test("wire view of an empty/absent state is null; totals view is flat", () => {
+test("wire view of an empty/absent state is null; totals view carries bounded entries", () => {
   assert.equal(wireView(null), null);
   const view = wireView(fold(autoCompactionEvents()));
   assert.deepEqual(view, {
@@ -244,8 +244,37 @@ test("wire view of an empty/absent state is null; totals view is flat", () => {
     itemsShadowed: 5,
     prunedResults: 1,
     running: false,
+    entries: [
+      {
+        compactionId: "C-A",
+        time: 1_040,
+        trigger: "auto",
+        status: "success",
+        items: 5,
+        tokens: 4_100,
+        took: 20,
+        provider: "deepseek",
+        model: "deepseek-v4-pro",
+        summaryPreview: "The user asked to refactor.",
+        error: null,
+        pruned: [{ seq: 11, tool: "bash", tokens: 120 }],
+      },
+    ],
     last: { time: 1_040, trigger: "auto", status: "success", items: 5, tokens: 4_100 },
   });
+});
+
+test("wire entries are bounded to the last 20", () => {
+  const events = [];
+  let seq = 0;
+  for (let i = 0; i < 25; i += 1) {
+    events.push(ev("compaction/start", { compactionId: `C-${i}` }, 1_000 + i * 100, seq++));
+    events.push(ev("compaction/end", { compactionId: `C-${i}` }, 1_060 + i * 100, seq++));
+  }
+  const view = wireView(fold(events));
+  assert.equal(view.entries.length, 20);
+  assert.equal(view.entries[0].compactionId, "C-5");
+  assert.equal(view.count, 25);
 });
 
 test("emptyState is plain JSON and promotable", () => {
