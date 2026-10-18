@@ -2,6 +2,8 @@
 
 [![npm](https://img.shields.io/npm/v/dsh-compaction-ledger)](https://www.npmjs.com/package/dsh-compaction-ledger)
 
+English | [中文](./README.zh.md)
+
 Compaction audit & recall for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) — the bridge back to what a context compaction took away.
 
 When DSH compacts a conversation, older history is shadowed out of the model's visible context. The durable session log keeps every shadowed event verbatim ("compaction hides superseded entries without deleting them"), but nothing in the harness reads it back: the model loses the content, and the user sees only a marker with two numbers. This plugin turns each compaction into a **ledger entry** — and gives both sides a way back:

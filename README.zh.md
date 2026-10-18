@@ -2,6 +2,8 @@
 
 [![npm](https://img.shields.io/npm/v/dsh-compaction-ledger)](https://www.npmjs.com/package/dsh-compaction-ledger)
 
+[English](./README.md) | 中文
+
 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的压缩审计与取回插件——把上下文压缩拿走的东西接回来。
 
 DSH 压缩会话时，较早的历史会从模型可见上下文中被遮蔽掉。持久会话日志逐字保留每一条被剪除的事件（官方原话："compaction hides superseded entries without deleting them"），但框架内没有任何东西把它读回来：模型丢了内容，用户只看到一个带两个数字的标记。本插件把每次压缩记成一本**账**，并给双方各留一条回路：
