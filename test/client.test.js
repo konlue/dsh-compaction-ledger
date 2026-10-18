@@ -12,6 +12,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { findAll } from "./harness.js";
 
 const body = (...lines) => lines.join("\n");
 
@@ -372,13 +373,17 @@ test("a settled recall_pruned tool call renders its content as Markdown", async 
     }),
   );
   assert.equal(findOne(settled, "disclosure").props.title, "recall_pruned");
-  assert.equal(findOne(settled, "markdown").props.text, RECALL);
+  // The recall text parses into item cards (see rich.test.js), so no markdown
+  // node renders for it; the pre-styled item body carries the text.
+  assert.equal(findOne(settled, "markdown"), null);
+  assert.equal(findOne(settled, "pre").props.children, "npm test output: 41 passing");
 
   // A result that never saw its tool/call event has no arguments to read.
   const orphan = render(
     row({ phase: "result", toolName: "recall_pruned", block: { kind: "tool-result", content: [{ type: "text", text: RECALL }], isError: false, call: null } }),
   );
-  assert.equal(findOne(orphan, "markdown").props.text, RECALL);
+  assert.equal(findOne(orphan, "markdown"), null);
+  assert.equal(findOne(orphan, "pre").props.children, "npm test output: 41 passing");
 });
 
 test("a failed recall_pruned falls back to its error text", async () => {
@@ -397,12 +402,19 @@ test("a failed recall_pruned falls back to its error text", async () => {
 test("a markdown failure degrades to the raw report instead of abdicating the entry", async () => {
   const { componentFor, render } = await loadClient({ markdownThrows: true });
   const card = componentFor("ledger");
-  // This must not throw: a throwing slot entry is retired and replaced by a
-  // bare error cell, which would hide the report entirely.
-  const tree = render(card({ node: { kind: "command", name: "ledger", args: null, outcome: { kind: "success", text: REPORT } } }));
+  // Only unparseable text reaches the Markdown renderer; a table report takes
+  // the rich path (see rich.test.js). This must not throw: a throwing slot
+  // entry is retired and replaced by a bare error cell, hiding the report.
+  const text = "Session compactions: none recorded yet — nothing to tabulate.";
+  const tree = render(card({ node: { kind: "command", name: "ledger", args: null, outcome: { kind: "success", text } } }));
   const pre = findOne(tree, "pre");
-  assert.equal(pre.props.children, REPORT);
+  assert.equal(pre.props.children, text);
   assert.equal(pre.props.style.whiteSpace, "pre-wrap");
+
+  // A table report renders through the rich path even when Markdown explodes.
+  const rich = render(card({ node: { kind: "command", name: "ledger", args: null, outcome: { kind: "success", text: REPORT } } }));
+  assert.equal(findOne(rich, "pre"), null);
+  assert.ok(findAll(rich, "div").some((n) => n.props.style?.display === "grid"));
 });
 
 test("missing ui primitives degrade to monospace text instead of an empty row", async () => {
